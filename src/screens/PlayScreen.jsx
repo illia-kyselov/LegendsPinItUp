@@ -1,30 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, SafeAreaView, StyleSheet, Image, TouchableOpacity, Modal } from 'react-native';
 import { Audio } from 'expo-av';
-import { BlurView } from 'expo-blur'; // Для блюра
-import { useSelector } from 'react-redux';
+import { BlurView } from 'expo-blur';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectLegends } from '../store/slices/customLegendsSlice';
+import { selectTeams, selectCurrentTeamIndex, selectCurrentRound, selectNumRounds, selectTimePerTurn, finishTurn } from '../store/slices/gameSlice';
 import PauseSVG from '../assets/game/PauseSVG';
 import PinImage from '../assets/game/pin.png';
-import { selectLegends } from '../store/slices/customLegendsSlice';
 
 export default function PlayScreen({ navigation, route }) {
-    const { firstTeam, rounds, selectedTime, chosenCategory } = route.params;
+    const { chosenCategory } = route.params;
     const legends = useSelector(selectLegends);
-    const legendsForCategory = legends.filter(legend => legend.category === chosenCategory);
+    const teams = useSelector(selectTeams);
+    const currentTeamIndex = useSelector(selectCurrentTeamIndex);
+    const currentRound = useSelector(selectCurrentRound);
+    const numRounds = useSelector(selectNumRounds);
+    const timePerTurn = useSelector(selectTimePerTurn);
+    const dispatch = useDispatch();
 
-    // Храним выбранную легенду, чтобы не обновлялась каждую секунду
+    const legendsForCategory = legends.filter(legend => legend.category === chosenCategory);
     const [randomLegend, setRandomLegend] = useState({ name: 'No Legend' });
     useEffect(() => {
         if (legendsForCategory.length > 0) {
-            setRandomLegend(legendsForCategory[Math.floor(Math.random() * legendsForCategory.length)]);
+            const randIndex = Math.floor(Math.random() * legendsForCategory.length);
+            setRandomLegend(legendsForCategory[randIndex]);
         }
     }, []);
 
-    const [remainingTime, setRemainingTime] = useState(selectedTime);
+    const [remainingTime, setRemainingTime] = useState(timePerTurn);
     const [isPaused, setIsPaused] = useState(false);
-    const [showPauseModal, setShowPauseModal] = useState(false); // отвечает за отображение модалки
+    const [showPauseModal, setShowPauseModal] = useState(false);
 
-    // Функция для проигрывания звука
     const playAlarm = async () => {
         try {
             const { sound } = await Audio.Sound.createAsync(
@@ -36,7 +42,6 @@ export default function PlayScreen({ navigation, route }) {
         }
     };
 
-    // Таймер
     useEffect(() => {
         if (isPaused || remainingTime === 0) return;
         const interval = setInterval(() => {
@@ -50,32 +55,41 @@ export default function PlayScreen({ navigation, route }) {
         return () => clearInterval(interval);
     }, [isPaused, remainingTime]);
 
-    // Нажатие на кнопку паузы: останавливаем таймер и показываем модалку
     const handlePause = () => {
         setIsPaused(true);
         setShowPauseModal(true);
     };
 
-    // Возобновляем таймер, скрываем модалку
     const handleContinue = () => {
         setShowPauseModal(false);
         setIsPaused(false);
     };
 
-    // Переходим в главное меню (экран 'Main')
     const handleMainMenu = () => {
-        navigation.navigate('Main');
+        navigation.replace('Main');
         setShowPauseModal(false);
     };
 
-    const progressPercent = ((selectedTime - remainingTime) / selectedTime) * 100;
+    const handleFinishTurn = (wasCorrect) => {
+        dispatch(finishTurn(wasCorrect));
+        const lastTeam = currentTeamIndex === teams.length - 1;
+        const lastRound = currentRound === numRounds - 1;
+        if (lastTeam && lastRound) {
+            navigation.replace('Stats');
+        } else {
+            navigation.replace('GameCategory');
+        }
+    };
+
+    const progressPercent = ((timePerTurn - remainingTime) / timePerTurn) * 100;
+    const currentTeamName = teams[currentTeamIndex] || '';
 
     return (
         <View style={styles.background}>
             <SafeAreaView style={styles.safe}>
                 <View style={styles.header}>
-                    <Text style={styles.teamTitle}>{firstTeam}</Text>
-                    <Text style={styles.scoreText}>1/{rounds}</Text>
+                    <Text style={styles.teamTitle}>{currentTeamName}</Text>
+                    <Text style={styles.scoreText}>{currentRound + 1}/{numRounds}</Text>
                     <TouchableOpacity onPress={handlePause}>
                         <PauseSVG />
                     </TouchableOpacity>
@@ -97,20 +111,17 @@ export default function PlayScreen({ navigation, route }) {
                         </View>
                     </>
                 ) : (
-                    // Когда время закончилось
                     <View style={styles.buttonRow}>
-                        <TouchableOpacity style={styles.incorrectButton}>
+                        <TouchableOpacity style={styles.incorrectButton} onPress={() => handleFinishTurn(false)}>
                             <Text style={styles.buttonText}>incorrect</Text>
                         </TouchableOpacity>
                         <View style={{ width: 2 }} />
-                        <TouchableOpacity style={styles.correctButton}>
+                        <TouchableOpacity style={styles.correctButton} onPress={() => handleFinishTurn(true)}>
                             <Text style={styles.buttonText}>correct</Text>
                         </TouchableOpacity>
                     </View>
                 )}
                 <View style={{ marginBottom: 36 }} />
-
-                {/* Модалка для паузы */}
                 <Modal
                     transparent
                     visible={showPauseModal}
@@ -255,11 +266,9 @@ const styles = StyleSheet.create({
         color: '#FCF9EA',
         textTransform: 'uppercase',
     },
-
-    /* ====== Модалка паузы ====== */
     modalOverlay: {
         flex: 1,
-        backgroundColor: '#00000040', // полупрозрачный фон
+        backgroundColor: '#00000040',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -307,7 +316,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: 8,
         flex: 1,
-        backgroundColor: 'transparent', // нет фона, текст чёрный
+        backgroundColor: 'transparent',
     },
     modalMainButtonText: {
         fontFamily: 'Montserrat Alternates',

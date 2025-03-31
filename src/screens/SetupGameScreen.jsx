@@ -7,6 +7,8 @@ import {
     StyleSheet,
     TextInput,
 } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { startGame } from '../store/slices/gameSlice';
 import ArrowBackSVG from '../assets/game/ArrowBackSVG';
 import AddSVG from '../assets/game/AddSVG';
 import DeleteSVG from '../assets/game/DeleteSVG';
@@ -17,14 +19,14 @@ export default function SetupGameScreen({ navigation }) {
     const [teams, setTeams] = useState(["", ""]);
     const [selectedRounds, setSelectedRounds] = useState(roundsOptions[0]);
     const [selectedTime, setSelectedTime] = useState(timeOptions[0]);
+    const dispatch = useDispatch();
+
     const isActive = teams.every(team => team.trim() !== "");
 
     const handleNext = () => {
-        navigation.navigate('GameCategory', {
-            rounds: selectedRounds,
-            firstTeam: teams[0],
-            selectedTime,
-        });
+        const trimmedTeams = teams.map(team => team.trim());
+        dispatch(startGame({ teams: trimmedTeams, numRounds: selectedRounds, timePerTurn: selectedTime }));
+        navigation.navigate('GameCategory');
     };
 
     const addTeam = () => {

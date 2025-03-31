@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, SafeAreaView, StyleSheet, Image } from 'react-native';
 import { useSelector } from 'react-redux';
+import { selectLegends } from '../store/slices/customLegendsSlice';
+import { selectTeams, selectCurrentTeamIndex, selectCurrentRound, selectNumRounds } from '../store/slices/gameSlice';
 import PauseSVG from '../assets/game/PauseSVG';
 import LeftSVG from '../assets/game/LeftSVG';
 import RightSVG from '../assets/game/RightSVG';
 import PinImage from '../assets/game/pin.png';
-import { selectLegends } from '../store/slices/customLegendsSlice';
 
-export default function GameCategoryScreen({ navigation, route }) {
-    const { firstTeam, rounds, selectedTime } = route.params;
+export default function GameCategoryScreen({ navigation }) {
+    const teams = useSelector(selectTeams);
+    const currentTeamIndex = useSelector(selectCurrentTeamIndex);
+    const currentRound = useSelector(selectCurrentRound);
+    const numRounds = useSelector(selectNumRounds);
     const legends = useSelector(selectLegends);
     const uniqueCategories = [...new Set(legends.map(legend => legend.category))];
     if (uniqueCategories.length === 0) return null;
+
     const [currentIndex, setCurrentIndex] = useState(0);
     const [prevCenterColor, setPrevCenterColor] = useState(null);
     const [colorPattern, setColorPattern] = useState('pattern1');
@@ -52,9 +57,6 @@ export default function GameCategoryScreen({ navigation, route }) {
 
     const handleNext = () => {
         navigation.navigate('Play', {
-            firstTeam,
-            rounds,
-            selectedTime,
             chosenCategory: uniqueCategories[currentIndex],
         });
     };
@@ -66,12 +68,14 @@ export default function GameCategoryScreen({ navigation, route }) {
     const centerCardColor = colorPattern === 'pattern1' ? oddColor : evenColor;
     const rightCardColor = colorPattern === 'pattern1' ? evenColor : oddColor;
 
+    const currentTeamName = teams[currentTeamIndex] || '';
+
     return (
         <View style={styles.background}>
             <SafeAreaView style={styles.safe}>
                 <View style={styles.header}>
-                    <Text style={styles.teamTitle}>{firstTeam}</Text>
-                    <Text style={styles.scoreText}>1/{rounds}</Text>
+                    <Text style={styles.teamTitle}>{currentTeamName}</Text>
+                    <Text style={styles.scoreText}>{currentRound + 1}/{numRounds}</Text>
                     <PauseSVG />
                 </View>
                 <View style={styles.cardsContainer}>

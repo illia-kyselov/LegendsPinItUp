@@ -1,29 +1,47 @@
-// Пример Redux-слайса для игры (используем Redux Toolkit)
 import { createSlice } from '@reduxjs/toolkit';
+
+const initialState = {
+    teams: [],
+    numRounds: 0,
+    timePerTurn: 60,
+    currentRound: 0,
+    currentTeamIndex: 0,
+    scores: [],
+};
+
 const gameSlice = createSlice({
     name: 'game',
-    initialState: {
-        teams: [],           // имена команд
-        roundsCount: 0,      // общее число раундов
-        timePerTurn: 0,      // время на раунд (секунды)
-        currentRound: 0,     // индекс текущего раунда (0-based)
-        currentTeam: 0,      // индекс текущей команды (0-based)
-        results: []          // результаты: [раунд][команда] = кол-во правильных ответов
-    },
+    initialState,
     reducers: {
-        initializeGame: (state, action) => {
-            const { teams, roundsCount, timePerTurn } = action.payload;
+        startGame: (state, action) => {
+            const { teams, numRounds, timePerTurn } = action.payload;
             state.teams = teams;
-            state.roundsCount = roundsCount;
+            state.numRounds = numRounds;
             state.timePerTurn = timePerTurn;
             state.currentRound = 0;
-            state.currentTeam = 0;
-            // Создаем матрицу результатов roundsCount x teamsCount, заполненную 0
-            state.results = Array.from({ length: roundsCount },
-                () => Array(teams.length).fill(0));
+            state.currentTeamIndex = 0;
+            state.scores = Array.from({ length: numRounds }, () => Array(teams.length).fill(0));
         },
-        // ... другие редюсеры добавим ниже
-    }
+        finishTurn: (state, action) => {
+            const wasCorrect = action.payload;
+            if (wasCorrect) {
+                state.scores[state.currentRound][state.currentTeamIndex] += 1;
+            }
+            if (state.currentTeamIndex < state.teams.length - 1) {
+                state.currentTeamIndex += 1;
+            } else {
+                state.currentTeamIndex = 0;
+                state.currentRound += 1;
+            }
+        },
+    },
 });
-export const { initializeGame, recordAnswer } = gameSlice.actions;
+
+export const { startGame, finishTurn } = gameSlice.actions;
+export const selectTeams = (state) => state.game.teams;
+export const selectNumRounds = (state) => state.game.numRounds;
+export const selectTimePerTurn = (state) => state.game.timePerTurn;
+export const selectCurrentRound = (state) => state.game.currentRound;
+export const selectCurrentTeamIndex = (state) => state.game.currentTeamIndex;
+export const selectScores = (state) => state.game.scores;
 export default gameSlice.reducer;

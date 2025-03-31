@@ -17,7 +17,6 @@ import { BlurView } from 'expo-blur';
 export default function CustomLegendsScreen({ navigation }) {
     const dispatch = useDispatch();
     const legends = useSelector(selectLegends);
-    // Фильтруем только новые легенды, добавленные пользователем (с маркером isCustom)
     const newLegends = legends.filter((legend) => legend.isCustom);
 
     const [modalVisible, setModalVisible] = useState(false);

@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import ArrowBackSVG from '../assets/game/ArrowBackSVG';
 
-// Список правил для удобства можно хранить в массиве
 const RULES = [
     'One player is randomly assigned a legendary athlete from the chosen sports category.',
     'That player keeps their legend a secret — the others must guess who it is.',

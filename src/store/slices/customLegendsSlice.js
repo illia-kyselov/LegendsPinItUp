@@ -2,7 +2,6 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     legends: [
-        // 1. Football (Soccer)
         { id: 'football-1', name: 'Lionel Messi (Argentina)', category: 'Football (Soccer)' },
         { id: 'football-2', name: 'Cristiano Ronaldo (Portugal)', category: 'Football (Soccer)' },
         { id: 'football-3', name: 'Pelé (Brazil)', category: 'Football (Soccer)' },
@@ -18,7 +17,6 @@ const initialState = {
         { id: 'football-13', name: 'Andrés Iniesta (Spain)', category: 'Football (Soccer)' },
         { id: 'football-14', name: 'Erling Haaland (Norway)', category: 'Football (Soccer)' },
         { id: 'football-15', name: 'Antoine Griezmann (France)', category: 'Football (Soccer)' },
-        // 2. Basketball
         { id: 'basketball-1', name: 'Michael Jordan (USA)', category: 'Basketball' },
         { id: 'basketball-2', name: 'LeBron James (USA)', category: 'Basketball' },
         { id: 'basketball-3', name: 'Kobe Bryant (USA)', category: 'Basketball' },
@@ -33,7 +31,6 @@ const initialState = {
         { id: 'basketball-12', name: 'Luka Dončić (Slovenia)', category: 'Basketball' },
         { id: 'basketball-13', name: 'Sue Bird (USA)', category: 'Basketball' },
         { id: 'basketball-14', name: 'Candace Parker (USA)', category: 'Basketball' },
-        // 3. Tennis
         { id: 'tennis-1', name: 'Serena Williams (USA)', category: 'Tennis' },
         { id: 'tennis-2', name: 'Roger Federer (Switzerland)', category: 'Tennis' },
         { id: 'tennis-3', name: 'Rafael Nadal (Spain)', category: 'Tennis' },
@@ -48,7 +45,6 @@ const initialState = {
         { id: 'tennis-12', name: 'Pete Sampras (USA)', category: 'Tennis' },
         { id: 'tennis-13', name: 'Martina Navratilova (Czech–USA)', category: 'Tennis' },
         { id: 'tennis-14', name: 'Björn Borg (Sweden)', category: 'Tennis' },
-        // 4. Athletics (Track & Field)
         { id: 'athletics-1', name: 'Usain Bolt (Jamaica)', category: 'Athletics (Track & Field)' },
         { id: 'athletics-2', name: 'Carl Lewis (USA)', category: 'Athletics (Track & Field)' },
         { id: 'athletics-3', name: 'Allyson Felix (USA)', category: 'Athletics (Track & Field)' },
@@ -62,7 +58,6 @@ const initialState = {
         { id: 'athletics-11', name: 'Yulimar Rojas (Venezuela)', category: 'Athletics (Track & Field)' },
         { id: 'athletics-12', name: 'Wayde van Niekerk (South Africa)', category: 'Athletics (Track & Field)' },
         { id: 'athletics-13', name: 'Dafne Schippers (Netherlands)', category: 'Athletics (Track & Field)' },
-        // 5. Combat Sports (Boxing / MMA)
         { id: 'combat-1', name: 'Muhammad Ali (USA)', category: 'Combat Sports (Boxing / MMA)' },
         { id: 'combat-2', name: 'Mike Tyson (USA)', category: 'Combat Sports (Boxing / MMA)' },
         { id: 'combat-3', name: 'Conor McGregor (Ireland)', category: 'Combat Sports (Boxing / MMA)' },
